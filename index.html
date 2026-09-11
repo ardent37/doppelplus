@@ -151,6 +151,12 @@
       color: var(--text);
       border: 1px solid var(--border);
     }
+    
+    .btn-spreadsheet {
+      background-color: #1e1e24;
+      color: #3b82f6;
+      border: 1px solid #3b82f6;
+    }
 
     .btn svg {
       width: 20px;
@@ -237,6 +243,7 @@
   </main>
 
   <div class="actions" id="actionButtons">
+    <!-- Botones de captura -->
     <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
     <button class="btn btn-primary" onclick="document.getElementById('cameraInput').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -255,6 +262,26 @@
       </svg>
       Elegir de la galería
     </button>
+
+    <!-- Separador y Hub de Afiliados -->
+    <div style="height: 1px; background: var(--border); margin: 12px 0;"></div>
+
+    <a href="AQUÍ_VA_LA_URL_A_TUS_SPREADSHEETS" style="text-decoration: none;">
+      <button class="btn btn-spreadsheet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Mis Spreadsheets Verificadas
+      </button>
+    </a>
+    
+    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; text-align: center;">
+      Usa el código <strong>SALTY</strong> en USFans.
+    </p>
   </div>
 
   <script>
@@ -299,7 +326,6 @@
           statusTitle.textContent = "Abriendo Doppel...";
           statusSubtitle.textContent = "Cargando resultados de búsqueda";
 
-          // La URL exacta que me has pasado
           window.location.href = `https://doppel.fit/s/image?imageUrl=${encodeURIComponent(uploadedUrl)}`;
 
         } catch (err) {
@@ -324,6 +350,22 @@
       actionButtons.style.display = 'flex';
       errorToast.textContent = msg;
       errorToast.style.display = 'block';
+    }
+
+    // Solución para el botón de Atrás (Bfcache)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        loadingState.style.display = 'none';
+        idleState.style.display = 'block';
+        actionButtons.style.display = 'flex';
+        cameraInput.value = '';
+        galleryInput.value = '';
+      }
+    });
+
+    // Registrar Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('Error SW:', err));
     }
   </script>
 </body>
