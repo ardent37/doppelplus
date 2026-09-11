@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.json">
 
   <style>
-    /* Declaración de tu fuente personalizada */
+    /* Declaración de la fuente Garet */
     @font-face {
       font-family: 'Garet';
       src: url('Garet.woff2') format('woff2'),
@@ -22,7 +22,7 @@
     }
 
     :root {
-      --bg: #262626; /* Color de fondo según tu mockup */
+      --bg: #262626;
       --text: #ffffff;
       --text-muted: #a3a3a3;
     }
@@ -83,8 +83,8 @@
     }
 
     .upload-box svg {
-      width: 54px;
-      height: 54px;
+      width: 58px;
+      height: 58px;
       fill: #ffffff;
       margin-bottom: 16px;
     }
@@ -102,15 +102,22 @@
       line-height: 1.4;
     }
 
-    /* Botón RGB de Spreadsheets */
+    /* Botón animado RGB de Spreadsheets */
     .rgb-btn-wrapper {
       position: relative;
       border-radius: 14px;
-      padding: 4px; /* Grosor del borde RGB */
-      background: linear-gradient(90deg, #74ff5e, #3da9ff);
+      padding: 4px; 
+      background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+      background-size: 200% 100%;
+      animation: rgb-border 2.5s linear infinite;
       text-decoration: none;
       display: block;
       transition: transform 0.15s ease;
+    }
+
+    @keyframes rgb-border {
+      0% { background-position: 100% 0; }
+      100% { background-position: 0 0; }
     }
 
     .rgb-btn-wrapper:active {
@@ -133,7 +140,7 @@
 
     /* Instrucciones iOS */
     .ios-guide {
-      display: none; /* Oculto por defecto */
+      display: none;
       margin-top: 20px;
       width: 100%;
     }
@@ -189,7 +196,7 @@
 
     /* Botón Android */
     .android-btn {
-      display: none; /* Oculto por defecto */
+      display: none;
       margin-top: 20px;
       width: 100%;
       background-color: rgba(255, 255, 255, 0.08);
@@ -253,29 +260,27 @@
 
   <main id="mainContent">
     
-    <!-- Input invisible unificado (Cámara/Galería) -->
-    <!-- Al no poner capture="environment", el móvil preguntará si usar cámara o galería -->
+    <!-- Input invisible para invocar el menú nativo (Fototeca / Hacer Foto / Archivos) -->
     <input type="file" id="imageInput" accept="image/*" hidden>
 
     <!-- Caja Punteada -->
     <label for="imageInput" class="upload-box">
-      <!-- Icono de cámara -->
-      <svg viewBox="0 0 24 24">
-        <path d="M4 8V6a2 2 0 0 1 2-2h2.518a2 2 0 0 0 1.638-.86l.87-1.26a2 2 0 0 1 1.639-.88h4.67a2 2 0 0 1 1.64.88l.87 1.26a2 2 0 0 0 1.637.86H24a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8zm10 10a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+      <!-- Icono de cámara nuevo (sólido y limpio) -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 6h-3.17L15 4H9L7.17 6H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/>
       </svg>
       <h2>Subir imagen</h2>
       <p>Encuentra cualquier producto<br>en el mercado chino</p>
     </label>
 
     <!-- Botón RGB Spreadsheets -->
-    <a href="AQUÍ_VA_LA_URL_A_TUS_SPREADSHEETS" class="rgb-btn-wrapper">
+    <a href="https://doppel.fit/@salty" class="rgb-btn-wrapper">
       <div class="rgb-btn-inner">
-        <!-- Reemplaza el src con la imagen exacta de tu botón de spreadsheets -->
-        <img src="spreadsheet-btn.png" alt="verified spreadsheets.">
+        <img src="verified.png" alt="verified spreadsheets.">
       </div>
     </a>
 
-    <!-- INSTRUCCIONES iOS (Se mostrará solo en iPhone Safari no instalado) -->
+    <!-- INSTRUCCIONES iOS -->
     <div id="iosInstallSection" class="ios-guide">
       <h3>Cómo instalar app:</h3>
       <ol>
@@ -286,7 +291,7 @@
       </ol>
     </div>
 
-    <!-- BOTÓN ANDROID (Se mostrará solo en Android no instalado) -->
+    <!-- BOTÓN ANDROID -->
     <button id="androidInstallBtn" class="android-btn">
       Instalar app
       <span class="icon-square">
@@ -296,7 +301,7 @@
 
   </main>
 
-  <!-- Pantalla de carga mientras se procesa la foto -->
+  <!-- Pantalla de carga -->
   <div id="loadingState" class="loading-state">
     <div class="spinner"></div>
     <h2 style="font-weight: normal; margin-bottom: 8px;">Procesando...</h2>
@@ -304,15 +309,12 @@
   </div>
 
   <script>
-    // Configuración API Doppel
     const IMGBB_API_KEY = "120d2c073cc31bae07fe792b613cf048";
     
-    // Elementos del DOM
     const imageInput = document.getElementById('imageInput');
     const mainContent = document.getElementById('mainContent');
     const loadingState = document.getElementById('loadingState');
     
-    // LÓGICA DE SUBIDA Y REDIRECCIÓN
     imageInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -348,7 +350,6 @@
       }
     });
 
-    // LÓGICA DEL BOTÓN "ATRÁS" (Bfcache)
     window.addEventListener('pageshow', (event) => {
       if (event.persisted) {
         loadingState.style.display = 'none';
@@ -356,30 +357,21 @@
         imageInput.value = '';
       }
     });
-
-    // ==========================================
-    // LÓGICA INTELIGENTE DE INSTALACIÓN (PWA)
-    // ==========================================
     
-    // 1. Detectar si ya está instalada como App
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-    
-    // 2. Detectar si es un dispositivo iOS
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
     if (!isStandalone) {
       if (isIOS) {
-        // Muestra las instrucciones de texto para iPhone
         document.getElementById('iosInstallSection').style.display = 'block';
       } else {
-        // En Android (Chrome), interceptamos el evento de instalación nativo
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
           e.preventDefault();
           deferredPrompt = e;
           
           const installBtn = document.getElementById('androidInstallBtn');
-          installBtn.style.display = 'flex'; // Mostramos el botón Android
+          installBtn.style.display = 'flex';
 
           installBtn.addEventListener('click', async () => {
             deferredPrompt.prompt();
@@ -393,7 +385,6 @@
       }
     }
 
-    // Registrar Service Worker para permitir la instalación
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(err => console.log('Error SW:', err));
     }
