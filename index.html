@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#09090b">
   <title>Doppel+ Lens</title>
 
+  <link rel="manifest" href="manifest.json">
+
   <style>
     :root {
       --bg: #09090b;
@@ -297,7 +299,8 @@
           statusTitle.textContent = "Abriendo Doppel...";
           statusSubtitle.textContent = "Cargando resultados de búsqueda";
 
-          window.location.href = `https://doppel.fit/?imageUrl=${encodeURIComponent(uploadedUrl)}`;
+          // La URL exacta que me has pasado
+          window.location.href = `https://doppel.fit/s/image?imageUrl=${encodeURIComponent(uploadedUrl)}`;
 
         } catch (err) {
           console.error(err);
