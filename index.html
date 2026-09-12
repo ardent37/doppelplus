@@ -107,7 +107,10 @@
       position: relative;
       border-radius: 14px;
       padding: 4px; 
-      background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+      /* El gradiente se duplica exactamente para que el bucle sea perfecto al llegar a la mitad */
+      background: linear-gradient(90deg, 
+        #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000, 
+        #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
       background-size: 200% 100%;
       animation: rgb-border 2.5s linear infinite;
       text-decoration: none;
@@ -253,7 +256,6 @@
 </head>
 <body>
 
-  <!-- Cabecera con tu imagen de logo -->
   <header>
     <img src="logo.png" alt="doppel+">
   </header>
@@ -265,9 +267,9 @@
 
     <!-- Caja Punteada -->
     <label for="imageInput" class="upload-box">
-      <!-- Icono de cámara nuevo (sólido y limpio) -->
+      <!-- Icono de cámara geométricamente centrado y rediseñado -->
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 6h-3.17L15 4H9L7.17 6H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/>
+        <path d="M9.5 4h5l1.5 3h4c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2h-16c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2h4L9.5 4zM12 19c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0-2.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
       </svg>
       <h2>Subir imagen</h2>
       <p>Encuentra cualquier producto<br>en el mercado chino</p>
