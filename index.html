@@ -41,11 +41,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      /* Margen estándar para la versión web */
       padding: 60px 24px 40px 24px;
     }
 
-    /* Ajuste de altura específico para la PWA instalada para igualar el diseño */
     @media (display-mode: standalone) {
       body {
         padding-top: max(110px, env(safe-area-inset-top) + 60px);
@@ -268,8 +266,8 @@
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M9.5 4h5l1.5 3h4c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2h-16c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2h4L9.5 4zM12 19c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0-2.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
       </svg>
-      <h2>Subir imagen</h2>
-      <p>Encuentra cualquier producto<br>en el mercado chino</p>
+      <h2 data-i18n="title_sub">Subir imagen</h2>
+      <p data-i18n="desc_sub">Encuentra cualquier producto<br>en el mercado chino</p>
     </label>
 
     <a href="https://doppel.fit/@salty" class="rgb-btn-wrapper">
@@ -279,17 +277,17 @@
     </a>
 
     <div id="iosInstallSection" class="ios-guide">
-      <h3>Cómo instalar app:</h3>
+      <h3 data-i18n="ios_title">Cómo instalar app:</h3>
       <ol>
-        <li>1. Pulsa <span class="icon-circle"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span></li>
-        <li>2. Selecciona "Compartir" <span class="icon-square"><svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L8.5 6.5M12 3l3.5 3.5M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6"/></svg></span></li>
-        <li>3. Despliega "Ver más" <span class="icon-circle"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></li>
-        <li>4. Selecciona "Añadir a pantalla de inicio" <span class="icon-square"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></li>
+        <li><span data-i18n="ios_1">1. Pulsa</span> <span class="icon-circle"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span></li>
+        <li><span data-i18n="ios_2">2. Selecciona "Compartir"</span> <span class="icon-square"><svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L8.5 6.5M12 3l3.5 3.5M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6"/></svg></span></li>
+        <li><span data-i18n="ios_3">3. Despliega "Ver más"</span> <span class="icon-circle"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></li>
+        <li><span data-i18n="ios_4">4. Selecciona "Añadir a pantalla de inicio"</span> <span class="icon-square"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></li>
       </ol>
     </div>
 
     <button id="androidInstallBtn" class="android-btn">
-      Instalar app
+      <span data-i18n="android_btn">Instalar app</span>
       <span class="icon-square">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       </span>
@@ -299,11 +297,106 @@
 
   <div id="loadingState" class="loading-state">
     <div class="spinner"></div>
-    <h2 style="font-weight: normal; margin-bottom: 8px;">Procesando...</h2>
-    <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con Doppel</p>
+    <h2 style="font-weight: normal; margin-bottom: 8px;" data-i18n="loading_title">Procesando...</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="loading_desc">Conectando con Doppel</p>
   </div>
 
   <script>
+    // --- SISTEMA DE TRADUCCIÓN ---
+    const translations = {
+      es: {
+        title_sub: "Subir imagen",
+        desc_sub: "Encuentra cualquier producto<br>en el mercado chino",
+        ios_title: "Cómo instalar app:",
+        ios_1: "1. Pulsa",
+        ios_2: "2. Selecciona \"Compartir\"",
+        ios_3: "3. Despliega \"Ver más\"",
+        ios_4: "4. Selecciona \"Añadir a pantalla de inicio\"",
+        android_btn: "Instalar app",
+        loading_title: "Procesando...",
+        loading_desc: "Conectando con Doppel",
+        alert_error: "Hubo un fallo al subir la fotografía. Inténtalo de nuevo."
+      },
+      en: {
+        title_sub: "Upload image",
+        desc_sub: "Find any product<br>in the Chinese market",
+        ios_title: "How to install app:",
+        ios_1: "1. Tap",
+        ios_2: "2. Select \"Share\"",
+        ios_3: "3. Scroll to \"More\"",
+        ios_4: "4. Select \"Add to Home Screen\"",
+        android_btn: "Install app",
+        loading_title: "Processing...",
+        loading_desc: "Connecting to Doppel",
+        alert_error: "There was an error uploading the photo. Please try again."
+      },
+      pl: {
+        title_sub: "Prześlij zdjęcie",
+        desc_sub: "Znajdź dowolny produkt<br>na chińskim rynku",
+        ios_title: "Jak zainstalować aplikację:",
+        ios_1: "1. Naciśnij",
+        ios_2: "2. Wybierz \"Udostępnij\"",
+        ios_3: "3. Rozwiń \"Więcej\"",
+        ios_4: "4. Wybierz \"Do ekranu początkowego\"",
+        android_btn: "Zainstaluj aplikację",
+        loading_title: "Przetwarzanie...",
+        loading_desc: "Łączenie z Doppel",
+        alert_error: "Wystąpił błąd podczas przesyłania zdjęcia. Spróbuj ponownie."
+      },
+      de: {
+        title_sub: "Bild hochladen",
+        desc_sub: "Finde jedes Produkt<br>auf dem chinesischen Markt",
+        ios_title: "App installieren:",
+        ios_1: "1. Tippe auf",
+        ios_2: "2. Wähle \"Teilen\"",
+        ios_3: "3. Scrolle zu \"Mehr\"",
+        ios_4: "4. Wähle \"Zum Home-Bildschirm\"",
+        android_btn: "App installieren",
+        loading_title: "Wird bearbeitet...",
+        loading_desc: "Verbindung zu Doppel",
+        alert_error: "Fehler beim Hochladen des Fotos. Bitte versuchen Sie es erneut."
+      },
+      it: {
+        title_sub: "Carica immagine",
+        desc_sub: "Trova qualsiasi prodotto<br>nel mercato cinese",
+        ios_title: "Come installare l'app:",
+        ios_1: "1. Tocca",
+        ios_2: "2. Seleziona \"Condividi\"",
+        ios_3: "3. Scorri su \"Altro\"",
+        ios_4: "4. Seleziona \"Aggiungi a Home\"",
+        android_btn: "Installa app",
+        loading_title: "Elaborazione...",
+        loading_desc: "Connessione a Doppel",
+        alert_error: "Si è verificato un errore durante il caricamento della foto. Riprova."
+      },
+      fr: {
+        title_sub: "Importer une image",
+        desc_sub: "Trouvez n'importe quel produit<br>sur le marché chinois",
+        ios_title: "Comment installer l'app :",
+        ios_1: "1. Appuyez sur",
+        ios_2: "2. Sélectionnez \"Partager\"",
+        ios_3: "3. Déroulez \"Plus\"",
+        ios_4: "4. Sélectionnez \"Sur l'écran d'accueil\"",
+        android_btn: "Installer l'app",
+        loading_title: "Traitement...",
+        loading_desc: "Connexion à Doppel",
+        alert_error: "Une erreur s'est produite lors du téléchargement de la photo. Veuillez réessayer."
+      }
+    };
+
+    let userLang = (navigator.language || navigator.userLanguage).split('-')[0];
+    if (!translations[userLang]) {
+      userLang = 'en'; // Inglés como respaldo predeterminado
+    }
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (translations[userLang][key]) {
+        el.innerHTML = translations[userLang][key];
+      }
+    });
+    // ----------------------------
+
     const IMGBB_API_KEY = "120d2c073cc31bae07fe792b613cf048";
     
     const imageInput = document.getElementById('imageInput');
@@ -337,7 +430,7 @@
 
       } catch (err) {
         console.error(err);
-        alert("Hubo un fallo al subir la fotografía. Inténtalo de nuevo.");
+        alert(translations[userLang].alert_error);
         loadingState.style.display = 'none';
         mainContent.style.display = 'flex';
       } finally {
