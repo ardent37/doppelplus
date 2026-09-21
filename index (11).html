@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#232323">
+  <title>Doppel+ Lens</title>
+
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    @font-face {
+      font-family: 'Garet';
+      src: url('Garet.woff2') format('woff2'),
+           url('Garet.woff') format('woff'),
+           url('Garet.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    :root {
+      --bg: #262626;
+      --text: #ffffff;
+      --text-muted: #a3a3a3;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Garet', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 24px 40px 24px;
+    }
+
+    @media (display-mode: standalone) {
+      body {
+        padding-top: max(110px, env(safe-area-inset-top) + 60px);
+      }
+    }
+
+    header {
+      margin-bottom: 50px;
+    }
+    
+    header img {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    main {
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .upload-box {
+      border: 3px dashed #ffffff;
+      border-radius: 20px;
+      padding: 50px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    /* Oculta visualmente el input de archivo sin usar el atributo "hidden".
+       En PWAs instaladas en iOS (display-mode: standalone), un input[type=file]
+       con "hidden" (display:none) puede hacer que WebKit inicie el selector
+       nativo (cámara/fototeca), lo aborte de inmediato y lo vuelva a abrir,
+       provocando el parpadeo. Mantenerlo en el árbol de layout (aunque
+       invisible e imperceptible) evita ese doble disparo. */
+    .file-input-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+      opacity: 0;
+    }
+
+    .upload-box:active {
+      opacity: 0.7;
+    }
+
+    .upload-box svg {
+      width: 58px;
+      height: 58px;
+      fill: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .upload-box h2 {
+      font-size: 1.5rem;
+      font-weight: normal;
+      letter-spacing: 0.02em;
+      margin-bottom: 8px;
+    }
+
+    .upload-box p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .rgb-btn-wrapper {
+      position: relative;
+      border-radius: 14px;
+      padding: 4px; 
+      background: linear-gradient(90deg, 
+        #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000, 
+        #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+      background-size: 200% 100%;
+      animation: rgb-border 2.5s linear infinite;
+      text-decoration: none;
+      display: block;
+      transition: transform 0.15s ease;
+    }
+
+    @keyframes rgb-border {
+      0% { background-position: 100% 0; }
+      100% { background-position: 0 0; }
+    }
+
+    .rgb-btn-wrapper:active {
+      transform: scale(0.98);
+    }
+
+    .rgb-btn-inner {
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .rgb-btn-inner img {
+      max-height: 28px;
+      width: auto;
+    }
+
+    /* Botón "40% off": misma forma y tamaño que el botón verified,
+       pero con borde blanco sólido en vez de rgb animado, y fondo
+       del mismo gris de la web en vez de blanco. */
+    .offer-btn-wrapper {
+      position: relative;
+      border-radius: 14px;
+      padding: 4px;
+      background-color: #ffffff;
+      text-decoration: none;
+      display: block;
+      transition: transform 0.15s ease;
+    }
+
+    .offer-btn-wrapper:active {
+      transform: scale(0.98);
+    }
+
+    .offer-btn-inner {
+      background-color: var(--bg);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .offer-btn-inner img {
+      max-height: 28px;
+      width: auto;
+    }
+
+    .ios-guide {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .ios-guide h3 {
+      font-size: 1.1rem;
+      font-weight: normal;
+      margin-bottom: 16px;
+    }
+
+    .ios-guide ol {
+      list-style: none;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 2.2;
+    }
+
+    .ios-guide li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      margin: 0 4px;
+    }
+    
+    .icon-square {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      margin: 0 4px;
+    }
+
+    .ios-guide svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-muted);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .android-btn {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      color: var(--text);
+      font-size: 1.1rem;
+      padding: 16px;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .android-btn:active {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .android-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .loading-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.12);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Barra de progreso real de subida, mismo estilo minimalista/oscuro */
+    .progress-track {
+      width: 200px;
+      height: 4px;
+      background-color: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #ffffff;
+      border-radius: 4px;
+      transition: width 0.15s ease;
+    }
+
+    .progress-percent {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Toast propio para errores, en vez de alert() nativo, para no romper
+       la sensación de app instalada */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(30px, env(safe-area-inset-bottom) + 20px);
+      transform: translateX(-50%) translateY(12px);
+      max-width: calc(100% - 48px);
+      background-color: #1c1c1c;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      text-align: center;
+      padding: 14px 20px;
+      border-radius: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="logo.png" alt="doppel+">
+  </header>
+
+  <main id="mainContent">
+    
+    <input type="file" id="imageInput" accept="image/*" class="file-input-hidden">
+
+    <label for="imageInput" class="upload-box">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.5 4h5l1.5 3h4c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2h-16c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2h4L9.5 4zM12 19c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0-2.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+      </svg>
+      <h2 data-i18n="title_sub">Subir imagen</h2>
+      <p data-i18n="desc_sub">Encuentra cualquier producto<br>en el mercado chino</p>
+    </label>
+
+    <a href="https://www.usfans.com/register?ref=GRAS35" class="offer-btn-wrapper">
+      <div class="offer-btn-inner">
+        <img id="offerImg" src="40OFF_en.png" alt="40% off">
+      </div>
+    </a>
+
+    <a href="https://doppel.fit/@salty" class="rgb-btn-wrapper">
+      <div class="rgb-btn-inner">
+        <img src="verified.png" alt="verified spreadsheets.">
+      </div>
+    </a>
+
+    <div id="iosInstallSection" class="ios-guide">
+      <h3 data-i18n="ios_title">Cómo instalar app:</h3>
+      <ol>
+        <li><span data-i18n="ios_1">1. Pulsa</span> <span class="icon-circle"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span></li>
+        <li><span data-i18n="ios_2">2. Selecciona "Compartir"</span> <span class="icon-square"><svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L8.5 6.5M12 3l3.5 3.5M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6"/></svg></span></li>
+        <li><span data-i18n="ios_3">3. Despliega "Ver más"</span> <span class="icon-circle"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></li>
+        <li><span data-i18n="ios_4">4. Selecciona "Añadir a pantalla de inicio"</span> <span class="icon-square"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></li>
+      </ol>
+    </div>
+
+    <button id="androidInstallBtn" class="android-btn">
+      <span data-i18n="android_btn">Instalar app</span>
+      <span class="icon-square">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </span>
+    </button>
+
+  </main>
+
+  <div id="loadingState" class="loading-state">
+    <div class="spinner"></div>
+    <h2 style="font-weight: normal; margin-bottom: 8px;" data-i18n="loading_title">Procesando...</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="loading_desc">Conectando con Doppel</p>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p class="progress-percent" id="progressPercent">0%</p>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // --- SISTEMA DE TRADUCCIÓN ---
+    const translations = {
+      es: {
+        title_sub: "Subir imagen",
+        desc_sub: "Encuentra cualquier producto<br>en el mercado chino",
+        ios_title: "Cómo instalar app:",
+        ios_1: "1. Pulsa",
+        ios_2: "2. Selecciona \"Compartir\"",
+        ios_3: "3. Despliega \"Ver más\"",
+        ios_4: "4. Selecciona \"Añadir a pantalla de inicio\"",
+        android_btn: "Instalar app",
+        loading_title: "Procesando...",
+        loading_desc: "Conectando con Doppel",
+        alert_error: "Hubo un fallo al subir la fotografía. Inténtalo de nuevo.",
+        alert_invalid_type: "El archivo seleccionado no es una imagen válida.",
+        alert_too_large: "La imagen es demasiado grande (máximo 25MB)."
+      },
+      en: {
+        title_sub: "Upload image",
+        desc_sub: "Find any product<br>in the Chinese market",
+        ios_title: "How to install app:",
+        ios_1: "1. Tap",
+        ios_2: "2. Select \"Share\"",
+        ios_3: "3. Scroll to \"More\"",
+        ios_4: "4. Select \"Add to Home Screen\"",
+        android_btn: "Install app",
+        loading_title: "Processing...",
+        loading_desc: "Connecting to Doppel",
+        alert_error: "There was an error uploading the photo. Please try again.",
+        alert_invalid_type: "The selected file is not a valid image.",
+        alert_too_large: "The image is too large (25MB max)."
+      },
+      pl: {
+        title_sub: "Prześlij zdjęcie",
+        desc_sub: "Znajdź dowolny produkt<br>na chińskim rynku",
+        ios_title: "Jak zainstalować aplikację:",
+        ios_1: "1. Naciśnij",
+        ios_2: "2. Wybierz \"Udostępnij\"",
+        ios_3: "3. Rozwiń \"Więcej\"",
+        ios_4: "4. Wybierz \"Do ekranu początkowego\"",
+        android_btn: "Zainstaluj aplikację",
+        loading_title: "Przetwarzanie...",
+        loading_desc: "Łączenie z Doppel",
+        alert_error: "Wystąpił błąd podczas przesyłania zdjęcia. Spróbuj ponownie.",
+        alert_invalid_type: "Wybrany plik nie jest prawidłowym obrazem.",
+        alert_too_large: "Obraz jest za duży (maksymalnie 25MB)."
+      },
+      de: {
+        title_sub: "Bild hochladen",
+        desc_sub: "Finde jedes Produkt<br>auf dem chinesischen Markt",
+        ios_title: "App installieren:",
+        ios_1: "1. Tippe auf",
+        ios_2: "2. Wähle \"Teilen\"",
+        ios_3: "3. Scrolle zu \"Mehr\"",
+        ios_4: "4. Wähle \"Zum Home-Bildschirm\"",
+        android_btn: "App installieren",
+        loading_title: "Wird bearbeitet...",
+        loading_desc: "Verbindung zu Doppel",
+        alert_error: "Fehler beim Hochladen des Fotos. Bitte versuchen Sie es erneut.",
+        alert_invalid_type: "Die ausgewählte Datei ist kein gültiges Bild.",
+        alert_too_large: "Das Bild ist zu groß (maximal 25MB)."
+      },
+      it: {
+        title_sub: "Carica immagine",
+        desc_sub: "Trova qualsiasi prodotto<br>nel mercato cinese",
+        ios_title: "Come installare l'app:",
+        ios_1: "1. Tocca",
+        ios_2: "2. Seleziona \"Condividi\"",
+        ios_3: "3. Scorri su \"Altro\"",
+        ios_4: "4. Seleziona \"Aggiungi a Home\"",
+        android_btn: "Installa app",
+        loading_title: "Elaborazione...",
+        loading_desc: "Connessione a Doppel",
+        alert_error: "Si è verificato un errore durante il caricamento della foto. Riprova.",
+        alert_invalid_type: "Il file selezionato non è un'immagine valida.",
+        alert_too_large: "L'immagine è troppo grande (massimo 25MB)."
+      },
+      fr: {
+        title_sub: "Importer une image",
+        desc_sub: "Trouvez n'importe quel produit<br>sur le marché chinois",
+        ios_title: "Comment installer l'app :",
+        ios_1: "1. Appuyez sur",
+        ios_2: "2. Sélectionnez \"Partager\"",
+        ios_3: "3. Déroulez \"Plus\"",
+        ios_4: "4. Sélectionnez \"Sur l'écran d'accueil\"",
+        android_btn: "Installer l'app",
+        loading_title: "Traitement...",
+        loading_desc: "Connexion à Doppel",
+        alert_error: "Une erreur s'est produite lors du téléchargement de la photo. Veuillez réessayer.",
+        alert_invalid_type: "Le fichier sélectionné n'est pas une image valide.",
+        alert_too_large: "L'image est trop volumineuse (25 Mo maximum)."
+      }
+    };
+
+    let userLang = (navigator.language || navigator.userLanguage).split('-')[0];
+    if (!translations[userLang]) {
+      userLang = 'en'; // Inglés como respaldo predeterminado
+    }
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (translations[userLang][key]) {
+        el.innerHTML = translations[userLang][key];
+      }
+    });
+    // ----------------------------
+
+    // Imagen del botón "40% off" según el idioma de la página
+    const offerImg = document.getElementById('offerImg');
+    if (offerImg) {
+      offerImg.src = userLang === 'es' ? '40OFF_es.png' : '40OFF_en.png';
+    }
+
+    const IMGBB_API_KEY = "120d2c073cc31bae07fe792b613cf048";
+
+    const imageInput = document.getElementById('imageInput');
+    const mainContent = document.getElementById('mainContent');
+    const loadingState = document.getElementById('loadingState');
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const toastEl = document.getElementById('toast');
+
+    const MAX_ORIGINAL_SIZE = 25 * 1024 * 1024; // 25MB antes de procesar
+    const MAX_UPLOAD_DIMENSION = 1600; // px, lado más largo tras redimensionar
+
+    let isUploading = false;
+    let toastTimeout;
+
+    // Toast propio (en vez de alert nativo) para no romper la sensación de app
+    function showToast(message) {
+      if (!toastEl) return;
+      toastEl.textContent = message;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toastEl.classList.remove('show'), 3500);
+    }
+
+    function setProgress(percent) {
+      const clamped = Math.max(0, Math.min(100, Math.round(percent)));
+      if (progressFill) progressFill.style.width = clamped + '%';
+      if (progressPercent) progressPercent.textContent = clamped + '%';
+    }
+
+    // Redimensiona/comprime la imagen antes de subir y, de paso, corrige la
+    // orientación EXIF y decodifica formatos como HEIC (Safari/iOS los soporta
+    // de forma nativa en createImageBitmap). Si algo falla o el navegador no
+    // soporta esta API, se sube el archivo original sin tocarlo.
+    async function processImage(file) {
+      if (typeof createImageBitmap !== 'function') return file;
+
+      try {
+        const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+
+        let { width, height } = bitmap;
+        if (width > MAX_UPLOAD_DIMENSION || height > MAX_UPLOAD_DIMENSION) {
+          const scale = MAX_UPLOAD_DIMENSION / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap, 0, 0, width, height);
+
+        if (typeof bitmap.close === 'function') bitmap.close();
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+        if (!blob) return file;
+
+        return new File([blob], 'upload.jpg', { type: 'image/jpeg' });
+      } catch (err) {
+        console.warn('No se pudo procesar la imagen, se sube el archivo original:', err);
+        return file;
+      }
+    }
+
+    // Subida con XMLHttpRequest para poder reportar progreso real (fetch no
+    // expone eventos de progreso de subida).
+    function uploadImageWithProgress(file, onProgress) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`);
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) {
+            onProgress((e.loaded / e.total) * 100);
+          }
+        };
+
+        xhr.onload = () => {
+          let data;
+          try {
+            data = JSON.parse(xhr.responseText);
+          } catch (err) {
+            reject(err);
+            return;
+          }
+          if (xhr.status >= 200 && xhr.status < 300 && data && data.success) {
+            resolve(data);
+          } else {
+            reject(new Error('upload_failed'));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error('network_error'));
+
+        const formData = new FormData();
+        formData.append('image', file);
+        xhr.send(formData);
+      });
+    }
+
+    imageInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file || isUploading) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast(translations[userLang].alert_invalid_type);
+        imageInput.value = '';
+        return;
+      }
+
+      if (file.size > MAX_ORIGINAL_SIZE) {
+        showToast(translations[userLang].alert_too_large);
+        imageInput.value = '';
+        return;
+      }
+
+      isUploading = true;
+      setProgress(0);
+      mainContent.style.display = 'none';
+      loadingState.style.display = 'flex';
+
+      try {
+        const optimizedFile = await processImage(file);
+
+        const data = await uploadImageWithProgress(optimizedFile, (percent) => {
+          setProgress(percent);
+        });
+
+        const uploadedUrl = data.data.url;
+        window.location.href = `https://doppel.fit/s/image?imageUrl=${encodeURIComponent(uploadedUrl)}`;
+
+      } catch (err) {
+        console.error(err);
+        showToast(translations[userLang].alert_error);
+        loadingState.style.display = 'none';
+        mainContent.style.display = 'flex';
+      } finally {
+        isUploading = false;
+        imageInput.value = '';
+      }
+    });
+
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        isUploading = false;
+        loadingState.style.display = 'none';
+        mainContent.style.display = 'flex';
+        imageInput.value = '';
+      }
+    });
+    
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (!isStandalone) {
+      if (isIOS) {
+        document.getElementById('iosInstallSection').style.display = 'block';
+      } else {
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          
+          const installBtn = document.getElementById('androidInstallBtn');
+          installBtn.style.display = 'flex';
+
+          installBtn.addEventListener('click', async () => {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+              installBtn.style.display = 'none';
+            }
+            deferredPrompt = null;
+          });
+        });
+      }
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('Error SW:', err));
+    }
+  </script>
+</body>
+</html>
